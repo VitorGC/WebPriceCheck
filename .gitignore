@@ -1,3 +1,2 @@
 #Ignore todos os arquivos de dados
-.csv
-dados.csv
+*.csv
