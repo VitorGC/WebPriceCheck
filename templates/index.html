@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tabela de Dados</title>
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 5px;
+            text-align: left;
+        }
+    </style>
+    <!-- Adiciona links para o jQuery e Bootstrap CSS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css">
+
+    <!-- Adiciona scripts para o Bootstrap e seus plugins -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <h1>Tabela de Dados</h1>
+    <!-- Criação dos filtros para as colunas "Nome" e "Idade" -->
+    <div class="container my-3">
+        <div class="row">
+            <div class="col-md-4">
+                <input type="text" class="form-control" id="filter01" placeholder="Filtrar por nome...">
+            </div>
+            <div class="col-md-4">
+                <input type="number" class="form-control" id="filter02" placeholder="Filtrar por idade...">
+            </div>
+            <div class="col-md-4">
+                <label for="multiplicador">Multiplicador:</label>
+                <input type="text" id="multiplicador" name="multiplicador">
+            </div>
+        </div>
+    </div> 
+   
+    <table id="table" class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Idade</th>
+                <th>Cidade</th>
+                <th>Prod + Frete</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data %}
+                <tr>
+                    <td class="filterable">{{ row['Nome'] }}</td>
+                    <td class="filterable" id="idade">{{ row['Idade'] }}</td>
+                    <td>{{ row['Cidade'] }}</td>
+                    <td class="resultado"></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <script>
+        $(document).ready(function() {
+            // Quando o usuário digitar algo no filtro de nome
+            $('#filter01').keyup(function() {
+                var nome = $(this).val().toLowerCase();
+                // Filtra as linhas da tabela que contêm o valor do filtro
+                $('#table tbody tr').filter(function() {
+                    $(this).toggle($(this).find('td:eq(0)').text().toLowerCase().indexOf(nome) > -1)
+                });
+            });
+    
+            // Quando o usuário digitar algo no filtro de idade
+            $('#filter02').keyup(function() {
+                var idade = $(this).val().toLowerCase();
+                // Filtra as linhas da tabela que contêm o valor do filtro
+                $('#table tbody tr').filter(function() {
+                    $(this).toggle($(this).find('td:eq(1)').text().toLowerCase().indexOf(idade) > -1)
+                });
+            });
+        });
+
+        $(document).ready(function() {
+            // Função para multiplicar os valores da coluna "Idade"
+            function multiplicar(idade, multiplicador) {
+                // Percorre todas as células da coluna "Idade"
+                $('#table tbody tr td:nth-child(2)').each(function() {
+                    // Obtém o valor da célula
+                    var valor = parseFloat($(this).data('original-value'));
+                    // Multiplica pelo multiplicador
+                    var novoValor = valor * multiplicador;
+                    // Atualiza o valor na célula
+                    $(this).text(novoValor.toFixed(2)); // Limita a duas casas decimais
+                });
+            }
+        
+            // Quando o usuário digitar um valor no campo de multiplicação
+            $('#multiplicador').keyup(function() {
+                // Obtém o valor do multiplicador
+                var multiplicador = parseFloat($(this).val());
+                // Verifica se o valor é um número
+                if (isNaN(multiplicador)) {
+                    // Se não for, retorna os valores originais da coluna "Idade"
+                    $('#table tbody tr td:nth-child(2)').each(function() {
+                        $(this).text($(this).data('original-value'));
+                    });
+                } else {
+                    // Se for, chama a função para multiplicar os valores da coluna "Idade"
+                    multiplicar('Idade', multiplicador);
+                }
+            });
+        
+            // Salva os valores originais da coluna "Idade" como atributos de dados das células
+            $('#table tbody tr td:nth-child(2)').each(function() {
+                $(this).data('original-value', $(this).text());
+            });
+        });
+        
+    </script>
+</body>
+</html>
